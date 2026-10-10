@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # College Lab Management System — CampusLab
 
 CampusLab provides a secure college computer lab operations, fault tracking, and live Windows computer monitoring solution. It comprises:
@@ -152,3 +153,6 @@ On each target Windows 10/11 lab PC:
 - **Least privilege:** Firestore client rules allow reads, but all updates to `monitoring` and `monitoringEvents` must go through the Node.js API with Firebase Admin SDK.
 - **Agent access control:** Each PC has an isolated token. If one machine is compromised, only that machine's token needs to be rotated.
 - **Encrypted transport:** Agents reject plain HTTP and enforce TLS 1.2+ HTTPS endpoints.
+=======
+# smart-lab-management
+>>>>>>> 66cc466aa0c4943dd4aa0bf932fe29a10052ae6c
