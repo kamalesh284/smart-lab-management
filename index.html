@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14213d">
+  <meta name="description" content="CampusLab — secure college computer lab operations, fault tracking and live Windows computer monitoring.">
+  <meta name="color-scheme" content="light">
+  <title>CampusLab | Lab Operations</title>
+  <link rel="icon" type="image/svg+xml" href="assets/campuslab.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/professional-overrides.css">
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <main id="loginView" class="login-wrap">
+    <section class="login-card">
+      <div class="brand-mark">CL</div>
+      <p class="eyebrow">CAMPUS IT OPERATIONS</p>
+      <h1 id="authTitle">Welcome back</h1>
+      <p id="authSubtitle" class="muted">Sign in to access your lab operations workspace.</p>
+
+      <div class="auth-toggle" aria-label="Authentication mode selector">
+        <button type="button" class="auth-mode-btn active" data-mode="login">Login</button>
+        <button type="button" class="auth-mode-btn" data-mode="signup">Create account</button>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <label for="email">Email address</label>
+        <input id="email" type="email" autocomplete="username" required placeholder="you@college.edu">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" required placeholder="Your password">
+        <button class="btn primary full" type="submit">Login</button>
+        <p id="loginError" class="error" aria-live="polite"></p>
+      </form>
+
+      <form id="signupForm" class="auth-form hidden">
+        <label for="signupName">Full name</label>
+        <input id="signupName" type="text" autocomplete="name" required placeholder="Your full name">
+
+        <label for="signupEmail">Email address</label>
+        <input id="signupEmail" type="email" autocomplete="username" required placeholder="you@college.edu">
+
+        <label for="signupPassword">Password</label>
+        <input id="signupPassword" type="password" autocomplete="new-password" required placeholder="Create a password">
+
+        <label for="signupConfirmPassword">Confirm password</label>
+        <input id="signupConfirmPassword" type="password" autocomplete="new-password" required placeholder="Confirm your password">
+
+        <button class="btn primary full" type="submit">Create account</button>
+        <p id="signupError" class="error" aria-live="polite"></p>
+      </form>
+
+      <p class="small muted">Accounts are created by your system administrator.</p>
+    </section>
+  </main>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="side-brand"><div class="brand-mark small-mark">CL</div><div><strong>CampusLab</strong><span>Lab operations platform</span></div></div>
+      <nav id="navigation" aria-label="Main navigation">
+        <button class="nav-item active" data-page="overview"><span>▦</span> Overview</button>
+        <button class="nav-item" data-page="systems"><span>▣</span> Systems</button>
+        <button class="nav-item" data-page="faults"><span>⚒</span> Fault reports</button>
+        <button class="nav-item" data-page="exam"><span>🗓</span> Exam allocation</button>
+        <button class="nav-item" data-page="monitoring"><span>◉</span> Auto monitoring</button>
+      </nav>
+      <div class="sidebar-note"><span class="live-dot"></span> Firestore live updates enabled</div>
+      <button id="signOutBtn" class="btn ghost signout">↪ Sign out</button>
+    </aside>
+
+    <section class="main-area">
+      <header class="topbar">
+        <div><p class="eyebrow">OPERATIONS / <span id="currentSection">OVERVIEW</span></p><h1 id="pageTitle">Lab overview</h1></div>
+        <div class="user-chip"><div class="avatar" id="avatar">U</div><div><strong id="userEmail">User</strong><span id="userRole">Role</span></div></div>
+      </header>
+
+      <section id="overviewPage" class="page">
+        <div class="welcome-row"><div><h2>Good day 👋</h2><p class="muted">Here's the current status of your computer labs.</p></div><span class="updated-label"><span class="live-dot"></span> Live data</span></div>
+        <div class="stat-grid">
+          <article class="stat-card"><div class="stat-top"><span>Total systems</span><span class="stat-icon blue">▣</span></div><strong id="totalCount">0</strong><p>Registered computers</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Working</span><span class="stat-icon green">✓</span></div><strong id="workingCount">0</strong><p>Available systems</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Not working</span><span class="stat-icon red">!</span></div><strong id="brokenCount">0</strong><p>Need attention</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Open faults</span><span class="stat-icon amber">⚒</span></div><strong id="faultCount">0</strong><p>Awaiting resolution</p></article>
+        </div>
+
+        <div class="panel lab-tracking-panel">
+          <div class="panel-heading"><div><h3>Live lab tracking</h3><p class="muted">Free, reserved, and ready-to-work lab status.</p></div></div>
+          <div id="labTrackingList" class="lab-tracking-list"><p class="empty">Loading lab status…</p></div>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel">
+            <div class="panel-heading"><div><h3>System status</h3><p class="muted">Latest status of registered computers</p></div><button class="text-btn" data-goto="systems">View all →</button></div>
+            <div class="table-wrap"><table><thead><tr><th>System</th><th>Lab</th><th>Status</th></tr></thead><tbody id="overviewSystems"><tr><td colspan="3" class="empty">Loading systems…</td></tr></tbody></table></div>
+          </article>
+          <article class="panel">
+            <div class="panel-heading"><div><h3>Recent faults</h3><p class="muted">Issues reported by staff</p></div><button class="text-btn" data-goto="faults">View all →</button></div>
+            <div id="recentFaults" class="recent-list"><p class="empty">Loading faults…</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="systemsPage" class="page hidden">
+        <div class="section-toolbar"><div><h2>Computer systems</h2><p class="muted">Register computers and update their current condition.</p></div><button id="showSystemForm" class="btn primary">＋ Add system</button></div>
+        <form id="systemForm" class="panel form-panel hidden">
+          <div class="panel-heading"><div><h3>Register a system</h3><p class="muted">Use a unique system ID for each computer.</p></div><button type="button" class="icon-btn" id="hideSystemForm" aria-label="Close form">✕</button></div>
+          <div class="form-grid">
+            <div><label for="systemId">System ID *</label><input id="systemId" required placeholder="LAB1-PC-001"></div>
+            <div><label for="labName">Lab / room *</label><input id="labName" required placeholder="Computer Lab 1"></div>
+            <div><label for="systemStatus">Status *</label><select id="systemStatus"><option value="working">Working</option><option value="not_working">Not working</option><option value="under_repair">Under repair</option><option value="maintenance">Maintenance</option></select></div>
+            <div><label for="labReservedBy">Lab reservation (optional)</label><input id="labReservedBy" placeholder="Reserved by faculty / exam team"></div>
+            <div class="span-two"><label for="systemNotes">Notes (optional)</label><input id="systemNotes" placeholder="PC specifications or location"></div>
+          </div>
+          <button class="btn primary" type="submit">Save system</button>
+        </form>
+        <div class="panel">
+          <div class="panel-heading responsive-heading"><div><h3>All systems</h3><p class="muted">Status changes are shared with signed-in users.</p></div><input id="systemSearch" class="search-input" placeholder="Search ID or lab…" aria-label="Search systems"></div>
+          <div class="table-wrap"><table><thead><tr><th>System ID</th><th>Lab / room</th><th>Notes</th><th>Status</th><th>Last updated</th><th>Action</th></tr></thead><tbody id="systemsTable"><tr><td colspan="6" class="empty">Loading systems…</td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="faultsPage" class="page hidden">
+        <div class="section-toolbar"><div><h2>Fault reports</h2><p class="muted">Report technical problems and follow repair progress.</p></div><button id="showFaultForm" class="btn primary">＋ Report fault</button></div>
+        <form id="faultForm" class="panel form-panel hidden">
+          <div class="panel-heading"><div><h3>Report a fault</h3><p class="muted">Provide enough detail for the technician to investigate.</p></div><button type="button" class="icon-btn" id="hideFaultForm" aria-label="Close form">✕</button></div>
+          <div class="form-grid">
+            <div><label for="faultSystem">System ID *</label><input id="faultSystem" required placeholder="LAB1-PC-001"></div>
+            <div><label for="faultPriority">Priority *</label><select id="faultPriority"><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select></div>
+            <div class="span-two"><label for="faultDescription">Fault description *</label><textarea id="faultDescription" required rows="3" placeholder="Describe the issue, error message, and when it began."></textarea></div>
+          </div>
+          <button class="btn primary" type="submit">Submit report</button>
+        </form>
+        <div class="panel">
+          <div class="panel-heading responsive-heading"><div><h3>All fault reports</h3><p class="muted">Technicians and administrators can update repair progress.</p></div><select id="faultFilter" class="search-input" aria-label="Filter faults"><option value="all">All statuses</option><option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option></select></div>
+          <div class="table-wrap"><table><thead><tr><th>System</th><th>Description</th><th>Priority</th><th>Status</th><th>Reported</th><th>Action</th></tr></thead><tbody id="faultsTable"><tr><td colspan="6" class="empty">Loading fault reports…</td></tr></tbody></table></div>
+        </div>
+      </section>
+      <section id="examPage" class="page hidden">
+        <div class="section-toolbar"><div><h2>Exam allocation</h2><p class="muted">Enter student count and exam timing to get the best lab automatically.</p></div></div>
+        <div class="content-grid single-column">
+          <div class="panel">
+            <div class="panel-heading"><div><h3>Allocate lab for exam</h3><p class="muted">The system matches the request to the best available lab based on seats and prior bookings.</p></div></div>
+            <form id="examAllocationForm" class="form-panel">
+              <div class="form-grid">
+                <div><label for="examCourse">Exam / subject *</label><input id="examCourse" required placeholder="Operating Systems Midterm"></div>
+                <div><label for="examStudentCount">Number of students *</label><input id="examStudentCount" type="number" min="1" required placeholder="35"></div>
+                <div><label for="examDate">Exam date *</label><input id="examDate" type="date" required></div>
+                <div><label for="examTime">Exam time *</label><input id="examTime" type="time" required></div>
+              </div>
+              <button class="btn primary" type="submit">Allocate lab</button>
+            </form>
+            <div id="examAllocationResult" class="allocation-result empty">No allocation requested yet.</div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-heading"><div><h3>Booked exam slots</h3><p class="muted">Live schedule for exam labs.</p></div></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Exam</th><th>Students</th><th>Date</th><th>Time</th><th>Allocated lab</th></tr></thead>
+                <tbody id="examAllocationTable"><tr><td colspan="5" class="empty">No exams scheduled.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="monitoringPage" class="page hidden">
+        <div class="section-toolbar"><div><h2>Automatic computer monitoring</h2><p class="muted">Heartbeat, basic hardware health and exam software checks from Windows agents.</p></div><span class="updated-label"><span class="live-dot"></span> Refreshes live</span></div>
+        <div class="stat-grid">
+          <article class="stat-card"><div class="stat-top"><span>Online</span><span class="stat-icon green">●</span></div><strong id="monitorOnlineCount">0</strong><p>Heartbeat received recently</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Needs attention</span><span class="stat-icon amber">!</span></div><strong id="monitorAttentionCount">0</strong><p>Health or software alerts</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Offline / never seen</span><span class="stat-icon red">○</span></div><strong id="monitorOfflineCount">0</strong><p>No heartbeat in the last 2 minutes</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Monitored systems</span><span class="stat-icon blue">▣</span></div><strong id="monitorTotalCount">0</strong><p>Systems currently included in monitoring</p></article>
+        </div>
+        <div class="panel"><div class="panel-heading responsive-heading"><div><h3>Live health details</h3><p class="muted">Offline means no heartbeat in 120 seconds; it does not necessarily mean the PC is powered off.</p></div><input id="monitorSearch" class="search-input" placeholder="Search system or lab…" aria-label="Search monitoring systems"></div>
+          <div class="table-wrap"><table><thead><tr><th>System / lab</th><th>Agent status</th><th>CPU</th><th>Memory</th><th>System disk free</th><th>Exam software</th><th>Last heartbeat</th><th>Alerts</th><th>Monitoring</th></tr></thead><tbody id="monitoringTable"><tr><td colspan="9" class="empty">Waiting for monitoring data…</td></tr></tbody></table></div>
+        </div>
+        <p class="muted small">Agent setup is required on every PC. See the project README for secure API deployment, per-computer tokens, and Windows installation.</p>
+      </section>
+      <footer>CampusLab <span>•</span> College IT operations <span>•</span> Secure monitoring workspace</footer>
+    </section>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(role) {
+      return isSignedIn() && getUserData().role == role;
+    }
+
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
+    function isLabStaff() {
+      return hasRole('lab_staff');
+    }
+
+    function isTechnician() {
+      return hasRole('technician');
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin() || isTechnician() || isLabStaff());
+      allow write: if isAdmin();
+    }
+
+    // Registered computer systems
+    match /systems/{systemId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && (isAdmin() || isLabStaff() || isTechnician());
+      allow delete: if isAdmin();
+    }
+
+    // Fault reports
+    match /faultReports/{faultId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // Monitoring snapshots (latest computer telemetry)
+    // Server API writes using Firebase Admin SDK (which bypasses rules).
+    // Client browsers must never write directly to monitoring documents.
+    match /monitoring/{systemId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    // Monitoring state transition events
+    // Readable only by admins and technicians. Client writes denied.
+    match /monitoringEvents/{eventId} {
+      allow read: if isSignedIn() && (isAdmin() || isTechnician());
+      allow write: if false;
+    }
+  }
+}

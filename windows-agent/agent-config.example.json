@@ -1,0 +1,40 @@
+{
+  "systemId": "LAB1-PC-001",
+  "apiUrl": "https://monitoring-api.college.example",
+  "token": "REPLACE_WITH_UNIQUE_RANDOM_TOKEN_FOR_THIS_PC",
+  "agentVersion": "1.0.0",
+  "reportIntervalSeconds": 60,
+  "thresholds": {
+    "cpuPercent": 90,
+    "memoryPercent": 90,
+    "diskFreePercent": 10
+  },
+  "examSoftware": [
+    {
+      "id": "safe_exam_browser",
+      "name": "Safe Exam Browser",
+      "required": true,
+      "paths": [
+        "C:\\Program Files\\SafeExamBrowser\\SafeExamBrowser.exe",
+        "C:\\Program Files (x86)\\SafeExamBrowser\\SafeExamBrowser.exe"
+      ],
+      "processNames": [
+        "SafeExamBrowser.exe"
+      ],
+      "serviceNames": []
+    },
+    {
+      "id": "nptel_exam_browser",
+      "name": "NPTEL Exam Client",
+      "required": false,
+      "paths": [
+        "C:\\NPTEL\\ExamClient.exe",
+        "C:\\Program Files\\NPTEL\\ExamClient.exe"
+      ],
+      "processNames": [
+        "ExamClient.exe"
+      ],
+      "serviceNames": []
+    }
+  ]
+}
