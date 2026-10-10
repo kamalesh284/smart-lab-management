@@ -7,6 +7,7 @@ let collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDoc, s
 
 // State management
 const ADMIN_EMAIL = 's.kamalesh284@gmail.com';
+const MOCK_ACCOUNTS_KEY = 'campuslab.mockAccounts';
 
 let currentUser = null;
 let userProfile = { role: 'admin', displayName: 'Administrator' };
@@ -22,6 +23,17 @@ function getRoleFromEmail(email) {
 
 function isAdminUser() {
   return getRoleFromEmail(currentUser?.email) === 'admin';
+}
+
+function getMockAccounts() {
+  const storedAccounts = localStorage.getItem(MOCK_ACCOUNTS_KEY);
+  if (!storedAccounts) return [];
+
+  const accounts = JSON.parse(storedAccounts);
+  if (!Array.isArray(accounts)) {
+    throw new Error('Saved demo accounts could not be read.');
+  }
+  return accounts;
 }
 
 function applyRolePermissions() {
@@ -971,11 +983,23 @@ if (loginForm) {
     }
 
     if (useMock) {
-      currentUser = { uid: 'mock-user-1', email };
-      userProfile = {
-        role: getRoleFromEmail(email),
-        displayName: email.split('@')[0]
-      };
+      try {
+        const account = getMockAccounts().find(item => item.email === email.toLowerCase());
+        if (!account) {
+          loginError.textContent = 'Email not found. Create your account first.';
+          return;
+        }
+
+        currentUser = { uid: `mock-user-${email.toLowerCase()}`, email };
+        userProfile = {
+          role: getRoleFromEmail(email),
+          displayName: account.displayName || email.split('@')[0]
+        };
+      } catch (err) {
+        console.error('Could not read demo accounts:', err);
+        loginError.textContent = 'Unable to check saved accounts. Please try again.';
+        return;
+      }
       updateUserUI();
       applyRolePermissions();
       loginView.classList.add('hidden');
@@ -993,7 +1017,9 @@ if (loginForm) {
       showToast('Signed in successfully');
     } catch (err) {
       console.error(err);
-      loginError.textContent = err.message || 'Invalid email or password.';
+      loginError.textContent = err.code === 'auth/user-not-found'
+        ? 'Email not found. Create your account first.'
+        : err.message || 'Invalid email or password.';
     }
   });
 }
@@ -1024,6 +1050,22 @@ if (signupForm) {
     }
 
     if (useMock) {
+      try {
+        const accounts = getMockAccounts();
+        if (accounts.some(account => account.email === email.toLowerCase())) {
+          setAuthFormMode('login');
+          loginError.textContent = 'An account with this email already exists. Please log in.';
+          return;
+        }
+
+        accounts.push({ email: email.toLowerCase(), displayName: name });
+        localStorage.setItem(MOCK_ACCOUNTS_KEY, JSON.stringify(accounts));
+      } catch (err) {
+        console.error('Could not save demo account:', err);
+        signupError.textContent = 'Unable to create your account. Please try again.';
+        return;
+      }
+
       currentUser = { uid: `mock-user-${Date.now()}`, email };
       userProfile = {
         role: getRoleFromEmail(email),
