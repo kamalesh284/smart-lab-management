@@ -16,8 +16,8 @@ let monitoringData = {};
 let useMock = !isConfigured;
 
 function getRoleFromEmail(email) {
-  if (!email) return 'student';
-  return email.toLowerCase() === ADMIN_EMAIL.toLowerCase() ? 'admin' : 'student';
+  if (!email) return 'admin';
+  return 'admin';
 }
 
 function isAdminUser() {
