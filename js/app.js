@@ -1106,94 +1106,32 @@ function bindFirestoreListeners() {
 
 // Local mock data when Firebase is unconfigured
 function setupMockData() {
+  const addGeneratedLabSystems = (labName, prefix, total, issueIndexes = []) => {
+    const timestamp = Date.now();
+    return Array.from({ length: total }, (_, index) => {
+      const systemNumber = index + 1;
+      const status = issueIndexes.includes(systemNumber)
+        ? 'not_working'
+        : (systemNumber % 9 === 0 ? 'under_repair' : 'working');
+
+      return {
+        systemId: `${prefix}${String(systemNumber).padStart(3, '0')}`,
+        labName,
+        status,
+        notes: `${labName} workstation ${systemNumber}`,
+        updatedAt: new Date(timestamp - (index * 120000))
+      };
+    });
+  };
+
   systems = [
-    { systemId: 'LAB1-PC-001', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 1 Desk 1', updatedAt: new Date() },
-    { systemId: 'LAB1-PC-002', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 1 Desk 2', updatedAt: new Date() },
-    { systemId: 'LAB1-PC-003', labName: 'Computer Lab 1', status: 'not_working', notes: 'Power supply failure', updatedAt: new Date(Date.now() - 3600000) },
-    { systemId: 'LAB1-PC-004', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 2 Desk 1', updatedAt: new Date(Date.now() - 120000) },
-    { systemId: 'LAB1-PC-005', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 2 Desk 2', updatedAt: new Date(Date.now() - 180000) },
-    { systemId: 'LAB1-PC-006', labName: 'Computer Lab 1', status: 'under_repair', notes: 'Keyboard driver issue', updatedAt: new Date(Date.now() - 5400000) },
-    { systemId: 'LAB1-PC-007', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 3 Desk 1', updatedAt: new Date(Date.now() - 240000) },
-    { systemId: 'LAB1-PC-008', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 3 Desk 2', updatedAt: new Date(Date.now() - 300000) },
-    { systemId: 'LAB1-PC-009', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 3 Desk 3', updatedAt: new Date(Date.now() - 420000) },
-    { systemId: 'LAB1-PC-010', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 3 Desk 4', updatedAt: new Date(Date.now() - 480000) },
-    { systemId: 'LAB1-PC-011', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 4 Desk 1', updatedAt: new Date(Date.now() - 540000) },
-    { systemId: 'LAB1-PC-012', labName: 'Computer Lab 1', status: 'working', notes: 'Dell OptiPlex, Row 4 Desk 2', updatedAt: new Date(Date.now() - 600000) },
-    { systemId: 'EXAM-HALL-001', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-002', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-003', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-004', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-005', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-006', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-007', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-008', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-009', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-010', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-011', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-012', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-013', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-014', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-015', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-016', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-017', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-018', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-019', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-020', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-021', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-022', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-023', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-024', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-025', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-026', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-027', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-028', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-029', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-030', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-031', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-032', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-033', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-034', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-035', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-036', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-037', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-038', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-039', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'EXAM-HALL-040', labName: 'Main Examination Hall', status: 'working', notes: 'Large exam hall, 40 desktop seats', updatedAt: new Date() },
-    { systemId: 'LAB2-PC-010', labName: 'CAD Lab 2', status: 'working', notes: 'HP Z-Station, Row 3', updatedAt: new Date() },
-    { systemId: 'LAB2-PC-011', labName: 'CAD Lab 2', status: 'under_repair', notes: 'Replacing RAM module', updatedAt: new Date(Date.now() - 7200000) },
-    { systemId: 'LAB2-PC-012', labName: 'CAD Lab 2', status: 'working', notes: 'HP Z-Station, Row 4', updatedAt: new Date(Date.now() - 60000) },
-    { systemId: 'LAB2-PC-013', labName: 'CAD Lab 2', status: 'working', notes: 'HP Z-Station, Row 5', updatedAt: new Date(Date.now() - 90000) },
-    { systemId: 'LAB2-PC-014', labName: 'CAD Lab 2', status: 'working', notes: 'HP Z-Station, Row 6', updatedAt: new Date(Date.now() - 110000) },
-    { systemId: 'LAB2-PC-015', labName: 'CAD Lab 2', status: 'working', notes: 'HP Z-Station, Row 7', updatedAt: new Date(Date.now() - 150000) },
-    { systemId: 'LAB3-PC-020', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 1', updatedAt: new Date() },
-    { systemId: 'LAB3-PC-021', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 2', updatedAt: new Date(Date.now() - 200000) },
-    { systemId: 'LAB3-PC-022', labName: 'Programming Lab 3', status: 'not_working', notes: 'Mouse disconnects repeatedly', updatedAt: new Date(Date.now() - 1800000) },
-    { systemId: 'LAB3-PC-023', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 4', updatedAt: new Date(Date.now() - 240000) },
-    { systemId: 'LAB3-PC-024', labName: 'Programming Lab 3', status: 'maintenance', notes: 'OS update pending', updatedAt: new Date(Date.now() - 3600000) },
-    { systemId: 'LAB3-PC-025', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 5', updatedAt: new Date(Date.now() - 150000) },
-    { systemId: 'LAB3-PC-026', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 6', updatedAt: new Date(Date.now() - 300000) },
-    { systemId: 'LAB3-PC-027', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 7', updatedAt: new Date(Date.now() - 340000) },
-    { systemId: 'LAB3-PC-028', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 8', updatedAt: new Date(Date.now() - 380000) },
-    { systemId: 'LAB3-PC-029', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 9', updatedAt: new Date(Date.now() - 420000) },
-    { systemId: 'LAB3-PC-030', labName: 'Programming Lab 3', status: 'working', notes: 'Lenovo ThinkCentre, Desk 10', updatedAt: new Date(Date.now() - 460000) },
-    { systemId: 'LAB4-PC-030', labName: 'Data Science Lab 4', status: 'working', notes: 'HP Workstation, Desk 1', updatedAt: new Date() },
-    { systemId: 'LAB4-PC-031', labName: 'Data Science Lab 4', status: 'working', notes: 'HP Workstation, Desk 2', updatedAt: new Date(Date.now() - 150000) },
-    { systemId: 'LAB4-PC-032', labName: 'Data Science Lab 4', status: 'working', notes: 'HP Workstation, Desk 3', updatedAt: new Date(Date.now() - 170000) },
-    { systemId: 'LAB4-PC-033', labName: 'Data Science Lab 4', status: 'not_working', notes: 'GPU driver issue', updatedAt: new Date(Date.now() - 900000) },
-    { systemId: 'LAB4-PC-034', labName: 'Data Science Lab 4', status: 'working', notes: 'HP Workstation, Desk 5', updatedAt: new Date(Date.now() - 250000) },
-    { systemId: 'LAB4-PC-035', labName: 'Data Science Lab 4', status: 'working', notes: 'HP Workstation, Desk 6', updatedAt: new Date(Date.now() - 400000) },
-    { systemId: 'LAB5-PC-040', labName: 'Network Lab 5', status: 'working', notes: 'Dell Tower, Rack 1', updatedAt: new Date() },
-    { systemId: 'LAB5-PC-041', labName: 'Network Lab 5', status: 'working', notes: 'Dell Tower, Rack 2', updatedAt: new Date(Date.now() - 290000) },
-    { systemId: 'LAB5-PC-042', labName: 'Network Lab 5', status: 'working', notes: 'Dell Tower, Rack 3', updatedAt: new Date(Date.now() - 120000) },
-    { systemId: 'LAB5-PC-043', labName: 'Network Lab 5', status: 'working', notes: 'Dell Tower, Rack 4', updatedAt: new Date(Date.now() - 180000) },
-    { systemId: 'LAB5-PC-044', labName: 'Network Lab 5', status: 'maintenance', notes: 'Switch port test', updatedAt: new Date(Date.now() - 6300000) },
-    { systemId: 'LAB5-PC-045', labName: 'Network Lab 5', status: 'working', notes: 'Dell Tower, Rack 6', updatedAt: new Date(Date.now() - 260000) },
-    { systemId: 'LAB6-PC-050', labName: 'General Lab 6', status: 'working', notes: 'Lenovo AIO, Desk 1', updatedAt: new Date() },
-    { systemId: 'LAB6-PC-051', labName: 'General Lab 6', status: 'working', notes: 'Lenovo AIO, Desk 2', updatedAt: new Date(Date.now() - 110000) },
-    { systemId: 'LAB6-PC-052', labName: 'General Lab 6', status: 'working', notes: 'Lenovo AIO, Desk 3', updatedAt: new Date(Date.now() - 210000) },
-    { systemId: 'LAB6-PC-053', labName: 'General Lab 6', status: 'working', notes: 'Lenovo AIO, Desk 4', updatedAt: new Date(Date.now() - 310000) },
-    { systemId: 'LAB6-PC-054', labName: 'General Lab 6', status: 'not_working', notes: 'Monitor flicker', updatedAt: new Date(Date.now() - 4200000) },
-    { systemId: 'LAB6-PC-055', labName: 'General Lab 6', status: 'working', notes: 'Lenovo AIO, Desk 6', updatedAt: new Date(Date.now() - 260000) }
+    ...addGeneratedLabSystems('Computer Lab 1', 'LAB1-PC-', 20, [3, 9]),
+    ...addGeneratedLabSystems('Main Examination Hall', 'EXAM-HALL-', 40, [12, 28, 34]),
+    ...addGeneratedLabSystems('CAD Lab 2', 'LAB2-PC-', 18, [5, 14]),
+    ...addGeneratedLabSystems('Programming Lab 3', 'LAB3-PC-', 22, [7, 16, 21]),
+    ...addGeneratedLabSystems('Data Science Lab 4', 'LAB4-PC-', 18, [4, 11, 17]),
+    ...addGeneratedLabSystems('Network Lab 5', 'LAB5-PC-', 18, [6, 13]),
+    ...addGeneratedLabSystems('General Lab 6', 'LAB6-PC-', 20, [8, 18])
   ];
 
   faultReports = [
