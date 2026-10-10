@@ -36,6 +36,45 @@ function getMockAccounts() {
   return accounts;
 }
 
+async function createPasswordVerifier(password, salt = crypto.getRandomValues(new Uint8Array(16))) {
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+  const derivedBits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    256
+  );
+
+  return {
+    passwordSalt: Array.from(salt, byte => byte.toString(16).padStart(2, '0')).join(''),
+    passwordHash: Array.from(new Uint8Array(derivedBits), byte => byte.toString(16).padStart(2, '0')).join('')
+  };
+}
+
+async function verifyMockPassword(account, password) {
+  if (!account.passwordSalt || !account.passwordHash) return false;
+
+  const salt = Uint8Array.from(
+    account.passwordSalt.match(/.{2}/g) || [],
+    byte => Number.parseInt(byte, 16)
+  );
+  if (salt.length !== 16) return false;
+
+  const verifier = await createPasswordVerifier(password, salt);
+  if (verifier.passwordHash.length !== account.passwordHash.length) return false;
+
+  let difference = 0;
+  for (let index = 0; index < verifier.passwordHash.length; index += 1) {
+    difference |= verifier.passwordHash.charCodeAt(index) ^ account.passwordHash.charCodeAt(index);
+  }
+  return difference === 0;
+}
+
 function applyRolePermissions() {
   const adminMode = isAdminUser();
 
@@ -989,6 +1028,10 @@ if (loginForm) {
           loginError.textContent = 'Email not found. Create your account first.';
           return;
         }
+        if (!await verifyMockPassword(account, password)) {
+          loginError.textContent = 'Incorrect password.';
+          return;
+        }
 
         currentUser = { uid: `mock-user-${email.toLowerCase()}`, email };
         userProfile = {
@@ -1017,9 +1060,13 @@ if (loginForm) {
       showToast('Signed in successfully');
     } catch (err) {
       console.error(err);
-      loginError.textContent = err.code === 'auth/user-not-found'
-        ? 'Email not found. Create your account first.'
-        : err.message || 'Invalid email or password.';
+      if (err.code === 'auth/user-not-found') {
+        loginError.textContent = 'Email not found. Create your account first.';
+      } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        loginError.textContent = 'Incorrect password.';
+      } else {
+        loginError.textContent = err.message || 'Unable to log in. Please try again.';
+      }
     }
   });
 }
@@ -1052,13 +1099,19 @@ if (signupForm) {
     if (useMock) {
       try {
         const accounts = getMockAccounts();
-        if (accounts.some(account => account.email === email.toLowerCase())) {
+        const existingAccount = accounts.find(account => account.email === email.toLowerCase());
+        if (existingAccount?.passwordHash) {
           setAuthFormMode('login');
           loginError.textContent = 'An account with this email already exists. Please log in.';
           return;
         }
 
-        accounts.push({ email: email.toLowerCase(), displayName: name });
+        const passwordVerifier = await createPasswordVerifier(password);
+        if (existingAccount) {
+          Object.assign(existingAccount, { displayName: name, ...passwordVerifier });
+        } else {
+          accounts.push({ email: email.toLowerCase(), displayName: name, ...passwordVerifier });
+        }
         localStorage.setItem(MOCK_ACCOUNTS_KEY, JSON.stringify(accounts));
       } catch (err) {
         console.error('Could not save demo account:', err);
